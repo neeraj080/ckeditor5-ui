@@ -189,11 +189,11 @@ export function addToolbarToDropdown( dropdownView, buttons ) {
  * @param {Iterable.<module:ui/dropdown/utils~ListDropdownItemDefinition>} items
  * A collection of the list item definitions to populate the list.
  */
-export function addListToDropdown( dropdownView, items ) {
+export function addListToDropdown( dropdownView, items, componentFactory ) {
 	const locale = dropdownView.locale;
 	const listView = dropdownView.listView = new ListView( locale );
 
-	listView.items.bindTo( items ).using( ( { type, model } ) => {
+	listView.items.bindTo( items ).using( ( { type, model, name } ) => {
 		if ( type === 'separator' ) {
 			return new ListSeparatorView( locale );
 		} else if ( type === 'button' || type === 'switchbutton' ) {
@@ -211,6 +211,14 @@ export function addListToDropdown( dropdownView, items ) {
 			buttonView.delegate( 'execute' ).to( listItemView );
 
 			listItemView.children.add( buttonView );
+
+			return listItemView;
+		} else if ( type === 'ui' ) {
+			const listItemView = new ListItemView( locale );
+
+			const view = componentFactory.create( name );
+
+			listItemView.children.add( view );
 
 			return listItemView;
 		}
